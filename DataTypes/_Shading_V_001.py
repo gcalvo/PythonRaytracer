@@ -13,35 +13,35 @@ class RGBAColor():
         self.A = max(0.0, min(1.0, alpha))
 
     def __str__(self):
-        return {"R":self.red,"G":self.G, "B":self.B, "A":self.A}
+        return "R: {0} ; G : {1} ; B : {2} ; A : {3}".format(self.R,self.G,self.B,self.A)
 
     def __setattr__(self, nomAttr, valAttr):
         """
             Set Attribute override for check value limits
         """
         realVal = max(0.0, min(1.0, valAttr))
-        object.__setattr__(nomAttr, realVal)
+        object.__setattr__(self, nomAttr, realVal)
 
     def __add__(self, other):
         """
-            Simple color adition, not alpha-weighted
+            Simple color adition, alpha-weighted
         """
         outColor = RGBAColor()
-        outColor.R = min(1.0, self.R + other.R)
-        outColor.G = min(1.0, self.G + other.G)
-        outColor.B = min(1.0, self.B + other.B)
+        outColor.R = min(1.0, self.R * self.A + other.R * other.A)
+        outColor.G = min(1.0, self.G * self.A + other.G * other.A)
+        outColor.B = min(1.0, self.B * self.A + other.B * other.A)
         outColor.A = min(1.0, self.A + other.A)
 
         return outColor
 
     def __sub__(self, other):
         """
-            Simple color substraction, not alpha-weighted
+            Simple color substraction, alpha-weighted
         """
         outColor = RGBAColor()
-        outColor.R = max(0.0, self.R - other.R)
-        outColor.G = max(0.0, self.G - other.G)
-        outColor.B = max(0.0, self.B - other.B)
+        outColor.R = max(0.0, self.R * self.A - other.R * other.A)
+        outColor.G = max(0.0, self.G * self.A - other.G * other.A)
+        outColor.B = max(0.0, self.B * self.A - other.B * other.A)
         outColor.A = max(0.0, self.A - other.A)
 
         return outColor
