@@ -1,0 +1,14 @@
+#!/usr/bin/python
+# -*- encoding: utf-8 -*-
+
+# Define some primitives.
+from DataTypes import Point, Vector
+from DataTypes import Color
+
+# Specify a behavior for each primitive.
+# Define some field sources.
+# Define the function domain.
+
+# for each sample in the domain
+
+#   compute the integral of the function

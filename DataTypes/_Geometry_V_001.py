@@ -1,108 +1,65 @@
-#!/usr/bin/python
-# -*- encoding: utf-8 -*-
-import math as mathLib
+# Vector and Point are defined in Algebra but should be in the package namespace
+from ._Algebra_V_001 import Vec3 as Vector, Point3 as Point
+EPSILON = 0.000001
 
-
-class Vec3():
+class RayA():
     """
-        Vec3 definition
+        Ray class definition
     """
-    def __init__(self, x=0.0, y=0.0, z=0.0):
+    def __init__(self, origin=Point(x=0.0,y=0.0,z=0.0), direction=Vector(x=0.0,y=-1.0,z=0.0)):
+        self.pos = origin
+        self.dir = direction
 
-        self.x = x
-        self.y = y
-        self.z = z
+    def __str__(self):
+        return "Origin : {0} \n Direction : {1} \n".format(self.pos.__str__(), self.dir.__str__())
+
+class TriangleA():
+    """
+        Triangle class definition
+    """
+    Epsilon = 0.000001
+    def __init__(self, p1=Point(x=1.0,y=0.0,z=0.0), p2=Point(x=0.0,y=1.0,z=0.0), p3=Point(x=0.0,y=0.0,z=1.0)):
+
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
 
     def __str__(self):
 
-        return "X : {0} ; Y : {1}, Z : {2} ;".format(self.x, self.y, self.z)
+        return "P1 : {0} \n P2 : {1} \n P3 : {2} \n".format(self.p1.__str__(), self.p2.__str__(), self.p3.__str__())
 
-    def __add__(self, other):
-        """
-            Simple vec3 adition
-        """
-        out = Vec3()
-
-        out.x = self.x + other.x
-        out.y = self.y + other.y
-        out.z = self.z + other.z
-
-        return out
-
-    def __sub__(self, other):
-        """
-            Simple vec3 substraction
-        """
-        out = Vec3()
-
-        out.x = self.x - other.x
-        out.y = self.y - other.y
-        out.z = self.z - other.z
-
-        return out
-
-    def __mul__(self, other):
-        """
-            Simple vec3 dot product
-        """
-        # To avoid type errors
-        if not isinstance(other, Vec3):
-
-            return self.__rmul__(other)
-
-        return (self.x * other.x + self.y * other.y + self.z * other.z)
-
-    def __rmul__(self, other):
-        """
-            Simple vec3 scalar product
-        """
-        out = Vec3()
-
-        out.x = self.x * other
-        out.y = self.y * other
-        out.z = self.z * other
-
-        return out
-
-    def normalize(self):
-        """
-            Normalizes the vector
-        """
-        length = self.length()
-
-        if length > 0.0:
-            self.x /= length
-            self.y /= length
-            self.z /= length
-
-    def length(self):
-        """
-            Returns the length of the vector
-        """
-        return mathLib.sqrt(self * self)
-
-class Point3():
-    """
-        Point3 definition
-    """
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def __str__(self):
-
-        return "X : {0} ; Y : {1}, Z : {2} ;".format(self.x, self.y, self.z)
-
-    def __sub__(self, other):
-        """
-            Returns the vector going from one point to the other
-        """
-        out = Vec3()
-
-        out.x = self.x - other.x
-        out.y = self.y - other.y
-        out.z = self.z - other.z
-
-        return out
+    # def ray_intersect(self, inRay):
+    #     """
+    #         Ray-Triangle intersection
+    #     """
+    #     u = self.p2 - self.p1
+    #     v = self.p3 - self.p1
+    #     n = u**v
+    #     if n == Vector():   # Degenerated triangle
+    #         return None
+    #     w0 = inRay.pos - self.p1
+    #
+    #
+    #
+    #
+    #
+    #     inRay.dir.CrossProduct(self.auxVec1, self.edge2)
+    #     det = self.auxVec1 * self.edge1
+    #     if det < EPSILON:
+    #         return None
+    #     self.auxVec2 = inRay.pos - self.p1
+    #     u = self.auxVec2 * self.auxVec1
+    #     if u < 0.0 or u > det:
+    #         return None
+    #
+    #     self.auxVec2.CrossProduct(self.auxVec3, self.edge1)
+    #     v = self.auxVec3 * inRay.dir
+    #     if v < 0.0 or (u+v) > det :
+    #         return None
+    #     t = self.edge2 * self.auxVec3
+    #     inv_det = 1.0 / det
+    #     t = t * inv_det
+    #     u = u * inv_det
+    #     v = v * inv_det
+    #
+    #     return (t,u,v)
