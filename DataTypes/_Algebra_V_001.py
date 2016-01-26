@@ -28,6 +28,18 @@ class Vec3():
 
         return out
 
+    def __neg__(self):
+        """
+            Simple vec3 negation
+        """ 
+        out = Vec3()
+
+        out.x = -self.x
+        out.y = -self.y
+        out.z = -self.z
+
+        return out
+
     def __sub__(self, other):
         """
             Simple vec3 substraction
@@ -98,6 +110,17 @@ class Vec3():
         """
         return mathLib.sqrt(self * self)
 
+    def as_point(self):
+        """
+            Returns the affine Point of the vector
+        """
+        out = Point3()
+
+        out.x = self.x
+        out.y = self.y
+        out.z = self.z
+
+        return out
 
 class Point3():
     """
@@ -124,3 +147,16 @@ class Point3():
         out.z = self.z - other.z
 
         return out
+
+    def as_vector(self):
+        """
+            Returns the vector going from the origin to the point
+        """
+        out = Vec3()
+
+        out.x = self.x
+        out.y = self.y
+        out.z = self.z
+
+        return out
+
