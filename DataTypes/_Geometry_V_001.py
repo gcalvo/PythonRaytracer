@@ -12,7 +12,7 @@ class RayA():
         self.dir = direction
 
     def __str__(self):
-        return "Origin : {0} \n Direction : {1} \n".format(self.pos.__str__(), self.dir.__str__())
+        return "Origin : {0} \nDirection : {1} \n".format(self.pos.__str__(), self.dir.__str__())
 
 class TriangleA():
     """
@@ -27,42 +27,36 @@ class TriangleA():
 
     def __str__(self):
 
-        return "P1 : {0} \n P2 : {1} \n P3 : {2} \n".format(self.p1.__str__(), self.p2.__str__(), self.p3.__str__())
+        return "P1 : {0} \nP2 : {1} \nP3 : {2} \n".format(self.p1.__str__(), self.p2.__str__(), self.p3.__str__())
 
     def ray_intersect(self, inRay):
         """
             Ray-Triangle intersection
         """
         # Get the vectors from the p1 vertex to the other two
-        u = self.p2 - self.p1
-        v = self.p3 - self.p1
-        # Calculate the geometric normal for the triangle
-        normal = u**v
-        # Check if it's a degenrated triangle
-        if normal == Vector():   # Degenerated triangle
+        e1 = self.p2 - self.p1
+        e2 = self.p3 - self.p1
+
+        P = inRay.dir**e2
+        det = P * e1
+        if (det > -EPSILON and det < EPSILON):
             return None
-        # Check if ray direction and normal are perpendicular
-        normal_dot_dir = normal * inRay.dir
-        if mathLib.abs(normal_dot_dir) < EPSILON:    # Ray parallel to triangle
-            return None 
-        # Free term on the plane equation
-        D = normal * self.p1.as_vector() 
-        # Conpute the distance to the intersection of the ray with triangle's plane
-        normal_dot_origin = normal * inRay.pos
-        dist = (D - normal_dot_origin) / normal_dot_dir
-        if dist < EPSILON:  # The ray is moving away
+        inv_det = 1.0 / det
+
+        T = inRay.pos - self.p1
+        u = (T * P) * inv_det
+
+        if (u < 0 or u > 1.0):
             return None
-        # We get the intersection point
-        iPoint = inRay.pos + inRay.dir * t
-        #Create a vector from p1 to the intersection point
-        w = iPoint -self.p1
-        # Get the projection of this vector in the system formed by u and v
-        # If any of this projections is negative or its sum  is over 1 then there 
-        # is no intersection
-        alpha = w * u
-        if alpha < 0 :
+
+        Q = T**e1
+        v = (inRay.dir * e1) * inv_det
+
+        if (v < 0 or (v + u) > 1.0):
             return None
-        beta = w * v
-        if (beta < 0) or ((alpha + beta) > 1):
-            return None
-        return (dist, alpha, beta)
+
+        dist = (e2 * Q) * inv_det
+
+        if dist > EPSILON :
+            iPoint = (inRay.pos.as_vector() + inRay.dir * dist).as_point()
+            return (dist, u, v, iPoint)

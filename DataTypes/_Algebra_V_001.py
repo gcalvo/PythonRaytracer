@@ -31,7 +31,7 @@ class Vec3():
     def __neg__(self):
         """
             Simple vec3 negation
-        """ 
+        """
         out = Vec3()
 
         out.x = -self.x
@@ -67,19 +67,25 @@ class Vec3():
         """
             Simple Vec3 scalar product
         """
-        out = Vec3()
+        # To avoid type errors
+        if isinstance(other, Vec3):
 
-        out.x = self.x * other
-        out.y = self.y * other
-        out.z = self.z * other
+            return self.__mul__(other)
 
-        return out
+        if isinstance(other, float):
+            out = Vec3()
+
+            out.x = self.x * other
+            out.y = self.y * other
+            out.z = self.z * other
+
+            return out
 
     def __pow__(self, inVec):
         """
             Simple Vec3 cross product
         """
-        outVec = Vec3()
+        out = Vec3()
 
         out.x = self.y * inVec.z - self.z * inVec.y
         out.y = self.z * inVec.x - self.x * inVec.z
@@ -159,4 +165,3 @@ class Point3():
         out.z = self.z
 
         return out
-
