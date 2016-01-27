@@ -1,7 +1,7 @@
 import math as mathLib
+from .PR_CONSTANTS import EPSILON
 
 from ._Algebra_V_001 import Vec3 as Vector, Point3 as Point
-EPSILON = 0.000001
 
 class RayA():
     """
