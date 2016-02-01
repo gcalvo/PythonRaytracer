@@ -60,3 +60,67 @@ class TriangleA():
         if dist > EPSILON :
             iPoint = (inRay.pos.as_vector() + inRay.dir * dist).as_point()
             return (dist, u, v, iPoint)
+
+    def aabb_intersect(self, aabb):
+        """
+            Triangle-AABB intersection test
+        """
+        # Check for aabb collision
+        maxX = max(self.p1.x,self.p2.x,self.p3.x)
+        if aabb["maxX"] < minX return False
+        minX = min(self.p1.x,self.p2.x,self.p3.x)
+        if aabb["minX"] > maxX return False
+        maxY = max(self.p1.y,self.p2.y,self.p3.y)
+        if aabb["maxY"] < minY return False
+        minY = min(self.p1.y,self.p2.y,self.p3.y)
+        if aabb["minY"] > maxY return False
+        maxZ = max(self.p1.z,self.p2.z,self.p3.z)
+        if aabb["maxZ"] < minZ return False
+        minZ = min(self.p1.z,self.p2.z,self.p3.z)            
+        if aabb["minZ"] > maxZ return False
+
+        # We check if the triangle plane intersects the aabb
+        e1 = self.p2 - self.p1
+        e2 = self.p3 - self.P1
+        normal = e1**e2
+        pMin = Point()
+        pMax = Point()
+
+        # We generate two point in a way that the vector between them gets the highest possible dot product with the normal
+        if normal.x >= 0:
+            vMin.x = aabb["minX"]
+            vMax.x = aabb["maxX"]
+        else:
+            vMax.x = aabb["minX"]
+            vMin.x = aabb["maxX"]
+
+        if normal.y >= 0:
+            vMin.y = aabb["minY"]
+            vMax.y = aabb["maxY"]
+        else:
+            vMax.y = aabb["minY"]
+            vMin.y = aabb["maxY"]
+
+        if normal.z >= 0:
+            vMin.z = aabb["minZ"]
+            vMax.z = aabb["maxZ"]
+        else:
+            vMax.z = aabb["minZ"]
+            vMin.z = aabb["maxZ"]
+
+        v_1 = pMin - p1
+        v_2 = pMax - p1
+        dot_1 = normal * v_1
+        dot_2 = normal * v_2
+
+        # If both points are in the same side there is not intersection
+        if (dot_1*dot_2 > 0):
+            return False
+
+
+
+        return True
+
+        { "maxX":-INF,"minX":INF,
+                    "maxY":-INF,"minY":INF,
+                    "maxZ":-INF,"minZ":INF }

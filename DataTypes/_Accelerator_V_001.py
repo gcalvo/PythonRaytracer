@@ -1,27 +1,116 @@
 # _Accelerator_V_001.py
-from .PR_CONSTANTS import INF
+from .PR_CONSTANTS import INF, PRIMLIMIT, DEPTHLIMIT
 
 class RT_Accelerator():
-    def __init__(self, depth=0):
-        self.bounds = { "maxX":-INF,
-                        "maxY":-INF,
-                        "maxZ":-INF,
-                        "minX":INF,
-                        "minY":INF,
-                        "minZ":INF }
-        # Child accelerators
-        self.childs = None
-        # triangle list
-        self.content = None
+    def __init__(self, primList, bounds, depth=0, avoid_checking=False):
+        """
+            el node padre debe pasarle:     -Los limites(los del nodo hijo).
+                                            -La lista de primitivas(del padre).
+            Genera una lista auxiliar de bool del mismo tamaño que la de primitivas.
+            Recorre las primitivas para determinar si hay interseccion con el nodo, y
+             marca el resultado en la lista auxiliar.
+            A partir de ambas listas genera la lista de primitivas propia.
+            Si no esta vacia entonces:
+                -Recalcula los limites para intentar reducirlos.
+                -Determina si necesita dividirse:
+                    -Determina los limites estimados de los nodos hijo.
+                    -Genera los nodos hijo.
+                    -Si el nodo hijo esta vacio, lo elimina.
+        """
 
-        if depth > 1 :
+        self.bounds = { "maxX":-INF,"minX":INF,
+                        "maxY":-INF,"minY":INF,
+                        "maxZ":-INF,"minZ":INF }
+                        
+        self.primitives = []
+       
+        if not avoid_checking:
+            for primitive in primList:
+                if primitive.intersects(self.bounds):
+                    self.primitives.append(primitive)
 
-            self.initialize_childs(depth=(depth - 1))
+        if len(self.primitives) > 0:
 
-        self.childs_depth = depth - 1
+            self.set_limits()
+            
+        self.childs = []
+
+        if len(self.primitives) > PRIMLIMIT and depth < DEPTHLIMIT:
+            self.initialize_childs()
+        # It's done!!
+
+    def initialize_childs():
+        limitX = self.limits["maxX"] + self.limits["minX"] * 0.5
+        limitY = self.limits["maxY"] + self.limits["minY"] * 0.5
+        limitZ = self.limits["maxZ"] + self.limits["minZ"] * 0.5
+
+        childBounds = { "maxX":limitX,"minX":self.limits["minX"],
+                        "maxY":limitY,"minY":self.limits["minY"],
+                        "maxZ":limitZ,"minZ":self.limits["minZ"]}
+
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":limitX,"minX":self.limits["minX"],
+                        "maxY":limitY,"minY":self.limits["minY"],
+                        "maxZ":self.limits["maxZ"],"minZ":limitZ}
+
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":limitX,"minX":self.limits["minX"],
+                        "maxY":self.limits["maxY"],"minY":limitY,
+                        "maxZ":limitZ,"minZ":self.limits["minZ"]}
+
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":limitX,"minX":self.limits["minX"],
+                        "maxY":self.limits["maxY"],"minY":limitY,
+                        "maxZ":self.limits["maxZ"],"minZ":limitZ}
+                        
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":self.limits["maxX"],"minX":limitX,
+                        "maxY":limitY,"minY":self.limits["minY"],
+                        "maxZ":limitZ,"minZ":self.limits["minZ"]}
+
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":self.limits["maxX"],"minX":limitX,
+                        "maxY":limitY,"minY":self.limits["minY"],
+                        "maxZ":self.limits["maxZ"],"minZ":limitZ}
+
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":self.limits["maxX"],"minX":limitX,
+                        "maxY":self.limits["maxY"],"minY":limitY,
+                        "maxZ":limitZ,"minZ":self.limits["minZ"]}
+
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
+        childBounds = { "maxX":self.limits["maxX"],"minX":limitX,
+                        "maxY":self.limits["maxY"],"minY":limitY,
+                        "maxZ":self.limits["maxZ"],"minZ":limitZ}
+                        
+        child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
+        if len(child.primitives) > 0:
+            self.childs.append(child)
+
 
     def __str__(self):
-        sChildDepth = "Child depth : {} levels\".format(self.child_depth)
+        sChildDepth = "Child depth : {} levels\n".format(self.child_depth)
         triangleCount = 0
         if self.content:
 
@@ -33,147 +122,13 @@ class RT_Accelerator():
 
         return sChildDepth + sContent + sLimits
 
-    def initialize_childs(self, depth=0):
-        if not self.childs:
-            if depth > 0:
+    def set_limits(self):
 
-                self.childs =   {   "U_U_U":RT_Accelerator(depth=depth),
-                                    "U_U_D":RT_Accelerator(depth=depth),
-                                    "U_D_U":RT_Accelerator(depth=depth),
-                                    "U_D_D":RT_Accelerator(depth=depth),
-                                    "D_U_U":RT_Accelerator(depth=depth),
-                                    "D_U_D":RT_Accelerator(depth=depth),
-                                    "D_D_U":RT_Accelerator(depth=depth),
-                                    "D_D_D":RT_Accelerator(depth=depth)    }
-        else:
-            print("This RT_Accelerator is already initialized, use subdivide instead.")
+        self.limits["minX"] = min(map((lambda x: min(x.p1.x,x.p2.x,x.p3.x)),self.triangles))
+        self.limits["maxX"] = max(map((lambda x: max(x.p1.x,x.p2.x,x.p3.x)),self.triangles))
+        self.limits["minY"] = min(map((lambda x: min(x.p1.y,x.p2.y,x.p3.y)),self.triangles))
+        self.limits["maxY"] = max(map((lambda x: max(x.p1.y,x.p2.y,x.p3.y)),self.triangles))
+        self.limits["minZ"] = min(map((lambda x: min(x.p1.z,x.p2.z,x.p3.z)),self.triangles))
+        self.limits["maxZ"] = max(map((lambda x: max(x.p1.z,x.p2.z,x.p3.z)),self.triangles))
 
-
-    def insert_triangle(self, tri):
-        """
-            Insert input triangle to self.content or self.childs
-        """
-        if not self.childs:
-            if not self.content:
-
-                self.content = []
-
-            self.content.insert(tri)
-        else:
-            self.insert_in_childs(tri)
-
-    def insert_in_childs(self, tri):
-
-        limitX = self.maxX + self.minX) * 0.5
-        limitY = self.maxY + self.minY) * 0.5
-        limitZ = self.maxZ + self.minZ) * 0.5
-
-        maxX = max(tri.p1.x,tri.p3.x,tri.p3.x)
-        minX = min(tri.p1.x,tri.p3.x,tri.p3.x)
-        maxY = max(tri.p1.y,tri.p3.y,tri.p3.y)
-        minY = min(tri.p1.y,tri.p3.y,tri.p3.y)
-        maxZ = max(tri.p1.z,tri.p3.z,tri.p3.z)
-        minZ = min(tri.p1.z,tri.p3.z,tri.p3.z)
-
-        if maxX < limitX:
-            if maxY < limitY:
-                if maxZ < limitZ:
-                    self.childs["D_D_D"].insert_triangle(tri)
-                elif minZ > limitZ:
-                    self.childs["D_D_U"].insert_triangle(tri)
-                else:
-                    self.split_triangle(tri)
-            elif minY > limitY:
-                if maxZ < limitZ:
-                    self.childs["D_U_D"].insert_triangle(tri)
-                elif minZ > limitZ:
-                    self.childs["D_U_U"].insert_triangle(tri)
-                else:
-                    self.split_triangle(tri)
-        elif minX > limitX:
-            if maxY < limitY:
-                if maxZ < limitZ:
-                    self.childs["U_D_D"].insert_triangle(tri)
-                elif minZ > limitZ:
-                    self.childs["U_D_U"].insert_triangle(tri)
-                else:
-                    self.split_triangle(tri)
-            elif minY > limitY:
-                if maxZ < limitZ:
-                    self.childs["U_U_D"].insert_triangle(tri)
-                elif minZ > limitZ:
-                    self.childs["U_U_U"].insert_triangle(tri)
-                else:
-                    self.split_triangle(tri)
-        else:
-            self.split_triangle(tri)
-
-    def purge_empty_childs(self):
-        """
-            Deletes recursively empty accelerating structures
-        """
-        if self.childs:
-
-            for childName, child in self.childs.items():
-
-                if not child.childs:
-                    if not child.content:
-
-                        delete(child)
-                        self.childs[childName] = None
-                else:
-
-                    child.purge_empty_childs()
-
-    def subdivide(self):
-        if not self.childs:
-
-            self.initialize_childs()
-
-            if self.content :
-
-                for tri in self.content:
-                    self.insert_in_childs(tri)
-
-                delete(self.content)
-                self.content = None
-
-        else:
-
-            for childName, child in self.childs.items():
-                child.subdivide()
-
-    def split_triangle(self, tri):
-        limitX = self.maxX + self.minX) * 0.5
-        limitY = self.maxY + self.minY) * 0.5
-        limitZ = self.maxZ + self.minZ) * 0.5
-
-        if tri.p1.x > limitX:
-            if tri.p2.x > limitX:
-                if tri.p3.x < limitX: #p3 is in the opposite side of limitX
-                    print("P3 en el eje X")
-            else:
-                if tri.p3.x > limitX:
-                    print("P2 en el eje X")
-                else:
-                    print("P2 y P3 en el eje X")
-        else:
-            if tri.p2.x < limitX:
-                if tri.p3.x > limitX: #p3 is in the opposite side of limitX
-                    print("P1 y P2 en el eje X")
-            else:
-                if tri.p3.x > limitX:
-                    print("P2 en el eje X")
-                else:
-                    print("P1 en el eje X")
-
-
-
-
-
-        maxX = max(tri.p1.x,tri.p3.x,tri.p3.x)
-        minX = min(tri.p1.x,tri.p3.x,tri.p3.x)
-        maxY = max(tri.p1.y,tri.p3.y,tri.p3.y)
-        minY = min(tri.p1.y,tri.p3.y,tri.p3.y)
-        maxZ = max(tri.p1.z,tri.p3.z,tri.p3.z)
-        minZ = min(tri.p1.z,tri.p3.z,tri.p3.z)
+ 
