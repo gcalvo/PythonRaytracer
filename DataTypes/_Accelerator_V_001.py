@@ -21,18 +21,16 @@ class RT_Accelerator():
         self.bounds = { "maxX":-INF,"minX":INF,
                         "maxY":-INF,"minY":INF,
                         "maxZ":-INF,"minZ":INF }
-                        
+
         self.primitives = []
-       
+
         if not avoid_checking:
             for primitive in primList:
                 if primitive.intersects(self.bounds):
                     self.primitives.append(primitive)
 
-        if len(self.primitives) > 0:
+        self.set_limits() # If self.primitives is empty does nothing.
 
-            self.set_limits()
-            
         self.childs = []
 
         if len(self.primitives) > PRIMLIMIT and depth < DEPTHLIMIT:
@@ -71,7 +69,7 @@ class RT_Accelerator():
         childBounds = { "maxX":limitX,"minX":self.limits["minX"],
                         "maxY":self.limits["maxY"],"minY":limitY,
                         "maxZ":self.limits["maxZ"],"minZ":limitZ}
-                        
+
         child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
         if len(child.primitives) > 0:
             self.childs.append(child)
@@ -103,7 +101,7 @@ class RT_Accelerator():
         childBounds = { "maxX":self.limits["maxX"],"minX":limitX,
                         "maxY":self.limits["maxY"],"minY":limitY,
                         "maxZ":self.limits["maxZ"],"minZ":limitZ}
-                        
+
         child = RT_Accelerator(self.primitives,childBounds,depth=depth+1)
         if len(child.primitives) > 0:
             self.childs.append(child)
@@ -130,5 +128,3 @@ class RT_Accelerator():
         self.limits["maxY"] = max(map((lambda x: max(x.p1.y,x.p2.y,x.p3.y)),self.triangles))
         self.limits["minZ"] = min(map((lambda x: min(x.p1.z,x.p2.z,x.p3.z)),self.triangles))
         self.limits["maxZ"] = max(map((lambda x: max(x.p1.z,x.p2.z,x.p3.z)),self.triangles))
-
- 
