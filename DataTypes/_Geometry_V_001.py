@@ -58,9 +58,13 @@ class TriangleA():
 
         if dist > EPSILON :
             iPoint = (inRay.pos.as_vector() + inRay.dir * dist).as_point()
-            return (dist, u, v, iPoint)
+            iNormal = e1**e2
+            return (dist, u, v, iPoint, iNormal, self.shade)
+    def shade(self, dist, u, v, iPoint, iNormal, inDir):
+        return iNormal * inDir
 
-    def aabb_intersect(self, aabb):
+
+    def intersect_aabb(self, aabb):
         """
             Triangle-AABB intersection test
             From Real-Time Raytracing
